@@ -150,18 +150,51 @@ namespace NSpecAdapterForXunit
         public MethodResult Execute(object testClass)
         {
             //run the example
-            this.Example.Context.Exercise(this.Example, this.Instance);
-            if (this.Example.Passed) //all good. the test passed.
+            try
             {
-                return new PassedResult(
-                    this.Method.Name, //methodName
-                    this.Method.TypeName, //typeName
-                    this.DisplayName, //displayName
-                    null); //traits
+                this.Example.Context.Exercise(this.Example, this.Instance);
+                if (this.Example.Passed) //all good. the test passed.
+                {
+                    return new PassedResult(
+                        this.Method.Name, //methodName
+                        this.Method.TypeName, //typeName
+                        this.DisplayName, //displayName
+                        null); //traits
+                }
+                else if (this.Example.Failed()) //oh noes!
+                {
+                    var ex = this.Example.Exception; //TODO: is this always != null?
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
+
+                    return new FailedResult(
+                        this.Method.Name, //methodDate
+                        this.Method.TypeName, //typeName
+                        this.DisplayName, //displayName
+                        null, //traits
+                        ex.GetType().Name, //exceptionType
+                        ex.Message, //message
+                        ex.StackTrace); //stackTrace
+                }
+                else //TODO: this should be pending examples
+                {
+                    //TODO: how to mark the test as inconclusive?
+                    return new SkipResult(
+                        this.Method.Name, //methodName
+                        this.Method.TypeName, //typeName
+                        this.DisplayName, //displayName
+                        null, //traits
+                        "Pending"); //reason
+                }
             }
-            else if (this.Example.Failed()) //oh noes!
+            catch (Exception ex)
             {
-                var ex = this.Example.Exception; //TODO: is this always != null?
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
 
                 return new FailedResult(
                     this.Method.Name, //methodDate
@@ -171,16 +204,6 @@ namespace NSpecAdapterForXunit
                     ex.GetType().Name, //exceptionType
                     ex.Message, //message
                     ex.StackTrace); //stackTrace
-            }
-            else //TODO: this should be pending examples
-            {
-                //TODO: how to mark the test as inconclusive?
-                return new SkipResult(
-                    this.Method.Name, //methodName
-                    this.Method.TypeName, //typeName
-                    this.DisplayName, //displayName
-                    null, //traits
-                    "Pending"); //reason
             }
         }
 
