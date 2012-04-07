@@ -74,10 +74,3 @@ Alternatevly, if you want to run just one method with [xUnit](https://xunit.code
 
 	3 total, 1 failed, 0 skipped, took 0.421 seconds
 
-<script type="text/javascript">
-    (function () {
-        var nb = document.createElement('script'); nb.type = 'text/javascript'; nb.async = true;
-        nb.src = 'http://s.prabir.me/nuget-button/0.1/nuget-button.min.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(nb, s);
-    })();
-</script>
