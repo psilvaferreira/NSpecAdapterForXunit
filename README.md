@@ -53,6 +53,8 @@ Alternatevly, if you want to run just one method with [xUnit](https://xunit.code
 	    }
 	}
 
+Testing with xunit.console:
+
 	C:\Test> xunit.console.clr4.exe NSpecAdapterForXunit.Sample.dll
 
 	xUnit.net console test runner (64-bit .NET 4.0.30319.261)
