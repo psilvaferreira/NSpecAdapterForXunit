@@ -29,7 +29,7 @@ namespace NSpecAdapterForXunit
     /// <summary>
     /// Implements a <see cref="T:Xunit.Sdk.ITestCommand"/> that invokes all NSpec <see cref="T:NSpec.Domain.Example"/> in one method.
     /// </summary>
-    internal class ExampleCommand : ITestCommand
+    internal class ExampleCommand : TestCommand
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NSpecAdapterForxUnit.ExampleCommand"/> to a specific <see cref="T:NSpec.Domain.Example"/>.
@@ -39,6 +39,7 @@ namespace NSpecAdapterForXunit
         /// <param name="instance">The instance to run the example.</param>
         /// <exception cref="T:System.ArgumentNullException">One of the arguments is <see langword="null"/>. </exception>
         public ExampleCommand(IMethodInfo method, Example example, nspec instance)
+            : base(method, example.FullName(), 0)
         {
             if (method == null)
             {
@@ -91,53 +92,15 @@ namespace NSpecAdapterForXunit
         }
 
         /// <summary>
-        /// Gets the display name of the test method.
-        /// </summary>
-        public string DisplayName
-        {
-            get
-            {
-                return Example.FullName();
-            }
-        }
-
-        /// <summary>
         /// Determines if the test runner infrastructure should create a new instance of the
         /// test class before running the test.
         /// </summary>
-        public bool ShouldCreateInstance
+        public override bool ShouldCreateInstance
         {
             get
             {
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Determines if the test should be limited to running a specific amount of time
-        /// before automatically failing.
-        /// </summary>
-        /// <returns>The timeout value, in milliseconds; if zero, the test will not have
-        /// a timeout.</returns>
-        public int Timeout
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        /// <summary>
-        /// Creates the start XML to be sent to the callback when the test is about to start
-        /// running.
-        /// </summary>
-        /// <returns>
-        /// Return the <see cref="T:System.Xml.XmlNode"/> of the start node, or null if the test
-        /// is known that it will not be running.
-        /// </returns>
-        public XmlNode ToStartXml()
-        {
-            return new XmlDocument().CreateElement("NSpec");
         }
 
         /// <summary>
@@ -147,7 +110,7 @@ namespace NSpecAdapterForXunit
         /// <returns>
         /// Returns information about the test run
         /// </returns>
-        public MethodResult Execute(object testClass)
+        public override MethodResult Execute(object testClass)
         {
             //run the example
             try
@@ -169,14 +132,7 @@ namespace NSpecAdapterForXunit
                         ex = ex.InnerException;
                     }
 
-                    return new FailedResult(
-                        this.Method.Name, //methodDate
-                        this.Method.TypeName, //typeName
-                        this.DisplayName, //displayName
-                        null, //traits
-                        ex.GetType().Name, //exceptionType
-                        ex.Message, //message
-                        ex.StackTrace); //stackTrace
+                    return new FailedResult(Method, ex, DisplayName);
                 }
                 else //TODO: this should be pending examples
                 {
@@ -196,14 +152,7 @@ namespace NSpecAdapterForXunit
                     ex = ex.InnerException;
                 }
 
-                return new FailedResult(
-                    this.Method.Name, //methodDate
-                    this.Method.TypeName, //typeName
-                    this.DisplayName, //displayName
-                    null, //traits
-                    ex.GetType().Name, //exceptionType
-                    ex.Message, //message
-                    ex.StackTrace); //stackTrace
+                return new FailedResult(Method, ex, DisplayName);
             }
         }
 
