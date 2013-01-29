@@ -52,4 +52,36 @@ namespace NSpecAdapterForXunit.Sample
             };
         }
     }
+
+    public class Sample2 : nspec
+    {
+        [Specification]
+        public void given_a_valid_date()
+        {
+            DateTime date = DateTime.Now;
+
+            before = () =>
+            {
+                date = DateTime.Now;
+            };
+
+            it["month should be greater than or equal to 1"] = () =>
+            {
+                date.Month.should_be_greater_or_equal_to(1);
+            };
+
+            it["month should be less than or equal to 12"] = () =>
+            {
+                date.Month.should_be_less_or_equal_to(12);
+            };
+
+            context["in a crazy world"] = () =>
+            {
+                it["day should be less than zero"] = () =>
+                {
+                    date.Day.should_be_less_than(0);
+                };
+            };
+        }
+    }
 }
